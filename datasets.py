@@ -22,11 +22,13 @@ logger.setLevel(logging.INFO)
 
 IMG_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif', '.tiff', '.webp')
 
+
 def mkdirs(dirpath):
     try:
         os.makedirs(dirpath)
     except Exception as _:
         pass
+
 
 def accimage_loader(path):
     import accimage
@@ -50,6 +52,7 @@ def default_loader(path):
         return accimage_loader(path)
     else:
         return pil_loader(path)
+
 
 class CustomTensorDataset(data.TensorDataset):
     def __getitem__(self, index):
@@ -117,6 +120,7 @@ class MNIST_truncated(data.Dataset):
     def __len__(self):
         return len(self.data)
 
+
 class FashionMNIST_truncated(data.Dataset):
 
     def __init__(self, root, dataidxs=None, train=True, transform=None, target_transform=None, download=False):
@@ -177,6 +181,7 @@ class FashionMNIST_truncated(data.Dataset):
 
     def __len__(self):
         return len(self.data)
+
 
 class SVHN_custom(data.Dataset):
 
@@ -296,7 +301,7 @@ class CelebA_custom(VisionDataset):
                  target_transform=None, download=False):
         import pandas
         super(CelebA_custom, self).__init__(root, transform=transform,
-                                     target_transform=target_transform)
+                                            target_transform=target_transform)
         self.split = split
         if isinstance(target_type, list):
             self.target_type = target_type
@@ -387,7 +392,8 @@ class CelebA_custom(VisionDataset):
                     # TODO: refactor with utils.verify_str_arg
                     raise ValueError("Target type \"{}\" is not recognized.".format(t))
         else:
-            X = PIL.Image.open(os.path.join(self.root, self.base_folder, "img_align_celeba", self.filename[self.dataidxs[index]]))
+            X = PIL.Image.open(
+                os.path.join(self.root, self.base_folder, "img_align_celeba", self.filename[self.dataidxs[index]]))
 
             target = []
             for t in self.target_type:
@@ -405,7 +411,7 @@ class CelebA_custom(VisionDataset):
 
         if self.transform is not None:
             X = self.transform(X)
-        #print("target[0]:", target[0])
+        # print("target[0]:", target[0])
         if target:
             target = tuple(target) if len(target) > 1 else target[0]
 
@@ -413,7 +419,7 @@ class CelebA_custom(VisionDataset):
                 target = self.target_transform(target)
         else:
             target = None
-        #print("celeba target:", target)
+        # print("celeba target:", target)
         return X, target
 
     def __len__(self):
@@ -425,7 +431,6 @@ class CelebA_custom(VisionDataset):
     def extra_repr(self):
         lines = ["Target type: {target_type}", "Split: {split}"]
         return '\n'.join(lines).format(**self.__dict__)
-
 
 
 class CIFAR10_truncated(data.Dataset):
@@ -484,6 +489,7 @@ class CIFAR10_truncated(data.Dataset):
     def __len__(self):
         return len(self.data)
 
+
 def gen_bar_updater() -> Callable[[int, int, int], None]:
     pbar = tqdm(total=None)
 
@@ -516,7 +522,7 @@ def download_url(url: str, root: str, filename: Optional[str] = None, md5: Optio
     # check if file is already present locally
     if check_integrity(fpath, md5):
         print('Using downloaded and verified file: ' + fpath)
-    else:   # download the file
+    else:  # download the file
         try:
             print('Downloading ' + url + ' to ' + fpath)
             urllib.request.urlretrieve(
@@ -537,6 +543,7 @@ def download_url(url: str, root: str, filename: Optional[str] = None, md5: Optio
         # check integrity of downloaded file
         if not check_integrity(fpath, md5):
             raise RuntimeError("File not found or corrupted.")
+
 
 def _is_tarxz(filename: str) -> bool:
     return filename.endswith(".tar.xz")
@@ -590,12 +597,12 @@ def extract_archive(from_path: str, to_path: Optional[str] = None, remove_finish
 
 
 def download_and_extract_archive(
-    url: str,
-    download_root: str,
-    extract_root: Optional[str] = None,
-    filename: Optional[str] = None,
-    md5: Optional[str] = None,
-    remove_finished: bool = False,
+        url: str,
+        download_root: str,
+        extract_root: Optional[str] = None,
+        filename: Optional[str] = None,
+        md5: Optional[str] = None,
+        remove_finished: bool = False,
 ) -> None:
     download_root = os.path.expanduser(download_root)
     if extract_root is None:
@@ -608,6 +615,7 @@ def download_and_extract_archive(
     archive = os.path.join(download_root, filename)
     print("Extracting {} to {}".format(archive, extract_root))
     extract_archive(archive, extract_root, remove_finished)
+
 
 class FEMNIST(MNIST):
     """
@@ -642,8 +650,7 @@ class FEMNIST(MNIST):
 
         if self.dataidxs is not None:
             self.data = self.data[self.dataidxs]
-            self.targets = self.targets[self.dataidxs]        
-
+            self.targets = self.targets[self.dataidxs]
 
     def __getitem__(self, index):
         img, target = self.data[index], int(self.targets[index])
@@ -692,12 +699,11 @@ class Generated(MNIST):
             self.targets = np.load("data/generated/y_train.npy")
         else:
             self.data = np.load("data/generated/X_test.npy")
-            self.targets = np.load("data/generated/y_test.npy")            
+            self.targets = np.load("data/generated/y_test.npy")
 
         if self.dataidxs is not None:
             self.data = self.data[self.dataidxs]
-            self.targets = self.targets[self.dataidxs]        
-
+            self.targets = self.targets[self.dataidxs]
 
     def __getitem__(self, index):
         data, target = self.data[index], self.targets[index]
@@ -707,13 +713,14 @@ class Generated(MNIST):
         return len(self.data)
 
 
-
 class genData(MNIST):
     def __init__(self, data, targets):
         self.data = data
         self.targets = targets
-    def __getitem__(self,index):
+
+    def __getitem__(self, index):
         data, target = self.data[index], self.targets[index]
         return data, target
+
     def __len__(self):
         return len(self.data)
